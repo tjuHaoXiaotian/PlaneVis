@@ -28,20 +28,33 @@
     
 
 
-    var rootUrl = "http://121.42.217.4:8080/Plane/simulation";
+    var rootUrl = "http://localhost:8080/Plane/simulation";
     
     function loadData(){
         $.ajax({
             url: rootUrl,
 //             contentType:"application/json",
             type: 'get',
-            dataType:'JSONP'
+            dataType:'JSON'
             // dataType: 'json'
 //             data:JSON.stringify(newApply)
         }).success(function(data){
-            alert(data);
-        }).error(function(){
+
+        	for(var i = 0;i < data.length;i++){
+        		var plane = data[i];
+        		// console.log(data[i]);
+        		var point = new BMap.Point(plane.lon, plane.lat);  // 创建点坐标  
+        		console.log(plane.lon);
+        		console.log(plane.lat);
+        		var marker = new BMap.Marker(point);        // 创建标注    
+                map.addOverlay(marker); 
+        	}
+        	// console.log(data);
+            
+        }).error(function(data){
 //            alert("获取失败");
+console.log(data);
+alert(data);
         });
     }
 
@@ -50,11 +63,11 @@
             url: rootUrl+ "/update",
 //             contentType:"application/json",
             type: 'get',
-            dataType:'JSONP'
+            dataType:'JSON'
             // dataType: 'json'
 //             data:JSON.stringify(newApply)
         }).success(function(data){
-            alert(data);
+            // alert(data);
         }).error(function(){
 //            alert("获取失败");
         });
@@ -63,11 +76,11 @@
     function startChinaModel() {
         loadData();
         getNext();
-//        setInterval(function() {
-//                loadData();
-//                getNext();
-//
-//        }, 10000);
+       setInterval(function() {
+               loadData();
+               getNext();
+
+       }, 4000);
     }
 
 
