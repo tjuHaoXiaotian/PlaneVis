@@ -25,7 +25,8 @@
     map.centerAndZoom(point, 15);                 // 初始化地图，设置中心点坐标和地图级别
     map.enableScrollWheelZoom();
 
-    startChinaModel();
+    
+
 
     var rootUrl = "http://121.42.217.4:8080/Plane/simulation";
     
@@ -34,29 +35,45 @@
             url: rootUrl,
 //             contentType:"application/json",
             type: 'get',
-            dataType: 'json'
+            dataType:'JSONP'
+            // dataType: 'json'
 //             data:JSON.stringify(newApply)
         }).success(function(data){
             alert(data);
         }).error(function(){
-            alert("获取失败");
+//            alert("获取失败");
         });
     }
 
     function getNext(){
-        $.getJSON(rootUrl + "/update", function(data) {
-            console.log(data);
+        $.ajax({
+            url: rootUrl+ "/update",
+//             contentType:"application/json",
+            type: 'get',
+            dataType:'JSONP'
+            // dataType: 'json'
+//             data:JSON.stringify(newApply)
+        }).success(function(data){
+            alert(data);
+        }).error(function(){
+//            alert("获取失败");
         });
     }
 
     function startChinaModel() {
+        loadData();
         getNext();
-        setInterval(function() {
-                loadData();
-                getNext();
-
-        }, 4000);
+//        setInterval(function() {
+//                loadData();
+//                getNext();
+//
+//        }, 10000);
     }
+
+
+    $(document).ready(function() {
+        startChinaModel();
+    });
 
 </script>
 </body>
