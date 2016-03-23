@@ -37,18 +37,11 @@
             zIndex:0,
             opacity:0.2
     });
-//    var canvas = document.createElement('canvas');
-//    canvas.width = map.getSize().width;
-//    canvas.height = map.getSize().height;
-//    var customLayer = new AMap.CustomLayer(canvas, {
-//        zooms: [3, 8],
-//        zIndex: 12
-//    });
-//    customLayer.setMap(map);
 
 
 
-    var rootUrl = "http://localhost:8080/Plane/simulation";
+
+    var rootUrl = "http://192.168.1.100/sorted_aircraftlist.json";
 
     function loadData(){
         $.ajax({
@@ -62,8 +55,10 @@
 //             data:JSON.stringify(newApply)
         }).success(function(data){
 
+
             for(var i = 0;i < data.length;i++){
                 var plane = data[i];
+                console.log($("#"+plane.icao));
                 var infoWindow = new AMap.InfoWindow();
                 function markerOver(e){
                     infoWindow.setContent(e.target.content);
@@ -73,27 +68,31 @@
 //                    infoWindow.setContent(e.target.content);
                     infoWindow.close(map, e.target.getCenter( ));
                 }
+// 画轨迹
+
+//                if(plane.icao)
 
                 // 创建点坐标
                 var marker = new AMap.Circle({
                     center: [plane.lon, plane.lat],
                     map:map,
-                    fillColor:"#"+plane.icao,
+                    fillColor:"#"+plane.hex,
                     strokeWeight:0,
-                    radius:300
+                    radius:300,
+                    id:""+plane.icao
 //                    animation:"AMAP_ANIMATION_DROP"
                 });
-                marker.content=  "<h4>"+plane.flight+"</h4><table>"+
-                "<tr><td>机名</td><td>"+(plane.flight)+"</td></tr>"+
-                "<tr><td>飞机编号</td><td>  "+(plane.icao)+"</td></tr>"+
+                marker.content=  "<h4>"+plane.fli+"</h4><table>"+
+                "<tr><td>航班号</td><td>"+(plane.fli)+"</td></tr>"+
+                "<tr><td>飞机编号(地址)</td><td>  "+(plane.hex)+"</td></tr>"+
                 "<tr><td>经度</td><td>  "+(plane.lon)+"</td></tr>"+
                 "<tr><td>纬度</td><td>  "+(plane.lat)+"</td></tr>"+
                 "<tr><td>海拔</td><td>  "+(plane.alt)+"</td></tr>"+
-                "<tr><td>速度</td><td>  "+(plane.speed)+"</td></tr>"+
-                "<tr><td>方向</td><td>  "+(plane.trueTrack)+"</td></tr>"+
-                "<tr><td>垂直速度</td><td>  "+(plane.vrate)+"</td></tr>"+
-                "<tr><td>距离</td><td>  "+(plane.dist)+"</td></tr>"+
-                "<tr><td>国家</td><td>  "+(plane.country)+"</td></tr>"+
+                "<tr><td>速度</td><td>  "+(plane.spd)+"</td></tr>"+
+                "<tr><td>方向</td><td>  "+(plane.trk)+"</td></tr>"+
+                "<tr><td>垂直速度</td><td>  "+(plane.vrt)+"</td></tr>"+
+                "<tr><td>距离</td><td>  "+(plane.dis)+"</td></tr>"+
+                "<tr><td>国家</td><td>  "+(plane.cou)+"</td></tr>"+
                 "</table>";
                 //给Marker绑定单击事件
                 marker.on('click', markerOver);
@@ -109,29 +108,11 @@
         });
     }
 
-    function getNext(){
-        $.ajax({
-            url: rootUrl+ "/update",
-//             contentType:"application/json",
-            type: 'get',
-            dataType:'JSON'
-            // dataType: 'json'
-//             data:JSON.stringify(newApply)
-        }).success(function(data){
-            // alert(data);
-        }).error(function(){
-//            alert("获取失败");
-        });
-    }
-
     function startChinaModel() {
         loadData();
-        getNext();
         setInterval(function() {
             loadData();
-            getNext();
-
-        }, 4000);
+        }, 5000);
     }
 
 
