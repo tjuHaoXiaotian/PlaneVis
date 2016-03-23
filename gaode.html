@@ -38,8 +38,74 @@
             opacity:0.2
     });
 
+//    var marker = new AMap.Polyline({
+//                        map:map,
+//                        fillColor:"#f00",
+//                        strokeColor:10,
+//                        storkeStyle:"solid",
+//                        path:[[117.36884,39.08735],[120.36884,20.08735]]
+//    //                    animation:"AMAP_ANIMATION_DROP"
+//                    });
 
 
+    var serverUrl = "http://192.168.1.103:8081/SavePlanes/mng/planes";
+
+    function loadPlaneNames(){
+        $.ajax({
+            url: serverUrl + "/names",
+//             contentType:"application/json",
+            type: 'get',
+            dataType:'JSON'
+        }).success(function(data){
+            var names = [];
+             names  = data;
+
+            for(var i = 0; i < names.length;i++){
+                loadEachPlane(names[i]);
+                console.log("数据是:\n"+names[i]);
+            }
+
+        }).error(function(data){
+//            alert("获取失败");
+            console.log(data);
+            alert(data);
+        });
+
+    }
+
+    function loadEachPlane(data){
+        $.ajax({
+            url: serverUrl + "/track",
+//             contentType:"application/json",
+            type: 'get',
+            dataType:'JSON',
+            data:{
+                fli:data
+            }
+        }).success(function(data){
+
+            console.log("数据：\n" + data);
+            var marker = new AMap.Polyline({
+                map:map,
+                strokeWeight:2,
+                strokeColor:getRandomColor(),
+                storkeStyle:"solid",
+                path:data
+                //                    animation:"AMAP_ANIMATION_DROP"
+            });
+
+        }).error(function(data){
+//            alert("获取失败");
+            console.log(data);
+            alert(data);
+        });
+
+    }
+
+    function getRandomColor(){
+
+        return '#'+(Math.random()*0xffffff<<0).toString(16);
+    }
 
     var rootUrl = "http://192.168.1.100/sorted_aircraftlist.json";
 
@@ -117,7 +183,9 @@
 
 
     $(document).ready(function() {
-        startChinaModel();
+//        startChinaModel();
+//        loadEachPlane("KAL958");
+        loadPlaneNames();
     });
 
 </script>
