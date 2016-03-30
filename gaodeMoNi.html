@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Plane Vis</title>
+    <style type="text/css">
+        html{height:90%}
+        body{height:100%;margin:50px;padding:0px;width:60%}
+        #container{height:100%}
+    </style>
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&32032a1889c8283166fe3df83b3fd856"></script>
+
+</head>
+
+<body>
+<div id="container"></div>
+
+<script src="vendor/jquery/dist/jquery.min.js" type="text/javascript"></script>
+<script src="js/muni.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var map = new AMap.Map("container",{
+//        zoom: 0.2,
+        center: [117.10, 39.10]
+    });          // 创建地图实例
+    //    map.setZoom(0);
+
+
+    AMap.plugin(['AMap.ToolBar','AMap.Scale'],function(){
+        var toolBar = new AMap.ToolBar();
+        var scale = new AMap.Scale();
+        map.addControl(toolBar);
+        map.addControl(scale);
+    });
+
+    var satellite = new  AMap.TileLayer.Satellite({
+        map:map,
+        zIndex:0,
+        opacity:0.2
+    });
+
+    function getRandomColor(){
+
+        return '#'+(Math.random()*0xffffff<<0).toString(16);
+    }
+
+    function draw() {
+
+        new AMap.Polyline({
+            map: map,
+            strokeWeight: 1,
+            strokeColor: getRandomColor(),
+            storkeStyle: "solid",
+            path: makeData(BJ, WLMQ, t)
+            //                    animation:"AMAP_ANIMATION_DROP"
+        });
+    }
+
+
+    function startMoNi() {
+         draw();
+        setInterval(function() {
+            draw();
+        }, 5000);
+    }
+
+    $(document).ready(function() {
+        startMoNi();
+    });
+
+
+</script>
+</body>
+</html>
