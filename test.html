@@ -1,92 +1,25 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
-    <title>Plane Vis</title>
-    <style type="text/css">
-        html{height:90%}
-        body{height:100%;margin:50px;padding:0px;width:100%}
-        #container{height:100%;width:60%;margin-top:50px}
-        #map5{width:40%;margin-top:50px}
+    <title>鼠标绘制点线面</title>
+    <link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
 
-        .button-group {
-            position: absolute;
-            /*bottom: 20px;*/
-            top:60px;
-            left: 60px;
-            font-size: 12px;
-            padding: 10px;
-        }
-
-        .button-group .button {
-            height: 28px;
-            line-height: 28px;
-            background-color: #0D9BF2;
-            color: #FFF;
-            border: 0;
-            outline: none;
-            padding-left: 5px;
-            padding-right: 5px;
-            border-radius: 3px;
-            margin-bottom: 4px;
-            cursor: pointer;
-        }
-        .button-group .inputtext {
-            height: 26px;
-            line-height: 26px;
-            border: 1px;
-            outline: none;
-            padding-left: 5px;
-            padding-right: 5px;
-            border-radius: 3px;
-            margin-bottom: 4px;
-            cursor: pointer;
-        }
-    </style>
     <link rel="stylesheet" href="vendor/bootstrap/dist/css/bootstrap.min.css" />
-
     <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&32032a1889c8283166fe3df83b3fd856&plugin=AMap.MouseTool"></script>
 
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
     <script src="vendor/jquery/dist/jquery.min.js" type="text/javascript"></script>
-    <script src="js/d3.js"></script>
-    <!--<script src="js/leftView.js" type="text/javascript"></script>-->
 </head>
-
 <body>
-
-        <div class="col-sm-6 col-lg-6" id="container">
-
-        </div>
-        <div class="button-group">
-            <input type="button" id="select" class="button" value="开启框选模式"/>
-        </div>
-
-        <div class="col-sm-4 col-lg-4" id="right">
-
-                <div id="map5" >
-                    map5
-                    <h3>侧视图</h3>
-                </div>
-                <h4 class="col-md-offset-4">北  <——>   南                     侧视图</h4>
-        </div>
-
-        <div style="left: 886px; top: 28px; opacity: 0;" id="tooltip1">
-            <h4>Maine</h4>
-            <table>
-                <tbody>
-                <tr><td>Low</td><td>56</td></tr>
-                <tr><td>Average</td><td>76</td></tr>
-                <tr><td>High</td><td>95</td></tr>
-                </tbody>
-            </table>
-        </div><!-- div to hold tooltip1. -->
-
-
-<script type="text/javascript">
-
+<div id="container"></div>
+<div class="button-group">
+    <input type="button" class="button" value="开启框选" id="point"/>
+    <input type="button" class="button" value="关闭框选" id="close"/>
+</div>
+<script>
     {
         var map = new AMap.Map("container", {
 //        zoom: 0.2,
@@ -124,7 +57,6 @@
 
         var serverUrl = "http://localhost:8080/SavePlanes/mng";
 
-//        var lines = [];
 
 
         function loadEachLine(id) {
@@ -211,8 +143,8 @@
                 //给Marker绑定单击事件
                 marker.on('click', markerClick);
                 marker.on('rightclick', markerRightClick);
-                marker.on('mouseover', markerOver);
-                marker.on('mouseout', markerOut);
+//                marker.on('mouseover', markerOver);
+//                marker.on('mouseout', markerOut);
 
             }).error(function (data) {
 //            alert("获取失败");
@@ -267,7 +199,7 @@
         /**
          * 框选
          */
-        map.plugin(["AMap.MouseTool"],function(){
+        //        //在地图中添加MouseTool插件
             var mouseTool = new AMap.MouseTool(map);
             AMap.event.addListener(mouseTool, "draw", function callback(e) {
                 var eObject = e.obj;//obj属性就是鼠标事件完成所绘制的覆盖物对象。
@@ -280,50 +212,54 @@
 
                 eObject.setMap(null);
                 getAllIncludeLines(xiNan.lng,xiNan.lat,dongBei.lng,dongBei.lat);
+
+
             });
+
+
+
+        AMap.event.addDomListener(document.getElementById('point'), 'click', function() {
             mouseTool.rectangle({
                 fillOpacity:0.2
             });
-        });
+        }, false);
 
-//        //在地图中添加MouseTool插件
-//        var mouseTool = new AMap.MouseTool(map);
-//        AMap.event.addDomListener(document.getElementById('select'), 'click', function() {
-//            mouseTool.marker({offset:new AMap.Pixel(-14,-11)});
-//        }, false);
+        AMap.event.addDomListener(document.getElementById('close'), 'click', function() {
+            mouseTool.close(true);
+        }, false);
 
         function getAllIncludeLines(x1,y1,x2,y2){
-                $.ajax({
-                    url: serverUrl + "/planes/withInRange",
+            $.ajax({
+                url: serverUrl + "/planes/withInRange",
 //                    contentType:"application/json",
-                    type: 'get',
-                    dataType: 'JSON',
-                    data:{
-                        x1:x1,
-                        y1:y1,
-                        x2:x2,
-                        y2:y2
-                    }
-                }).success(function (data) {
+                type: 'get',
+                dataType: 'JSON',
+                data:{
+                    x1:x1,
+                    y1:y1,
+                    x2:x2,
+                    y2:y2
+                }
+            }).success(function (data) {
 
-                    map.getAllOverlays("polyline").forEach(function(line){
-                        console.log("marker 的 id是：",line.id);
+                map.getAllOverlays("polyline").forEach(function(line){
+                    console.log("marker 的 id是：",line.id);
 
-                        data.forEach(function(id){
-                            if(id <= 20){
-                                if(id == line.id) {
-                                    line.setOptions({
-                                        strokeWeight: 10
-                                    });
-                                }
+                    data.forEach(function(id){
+                        if(id <= 20){
+                            if(id == line.id) {
+                                line.setOptions({
+                                    strokeWeight: 10
+                                });
                             }
-                        });
-
+                        }
                     });
 
-                }).error(function(data){
-
                 });
+
+            }).error(function(data){
+
+            });
         }
 
         function equal(line,data){
@@ -340,15 +276,12 @@
         }
 
         $(document).ready(function () {
-//            for (var i = 0; i < 20; i++) {
-//                loadEachLine(i + 1);
-//            }
+            for (var i = 0; i < 20; i++) {
+                loadEachLine(i + 1);
+            }
         });
 
     }
-
-
-
 </script>
 </body>
 </html>
